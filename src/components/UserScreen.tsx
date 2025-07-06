@@ -7,13 +7,79 @@ import {
   SimpleGrid,
   Text,
   Heading,
+  Button,
+   IconButton 
 } from "@chakra-ui/react";
+import { useState } from "react";
+import { useNavigate } from 'react-router';
+import api from '../api/api'
+import {TrashIcon, PencilIcon} from '@phosphor-icons/react'
 
-function UserScreen() {
+import UserInterface from "../interfaces/UserInterface";
+
+
+function UserScreen({isAdmin = false} : {isAdmin?: boolean } = {}) {
+  
+  
+  const navigate = useNavigate()
+    const [id, setId] = useState('')
+   
+    const [users, setUsers] = useState<UserInterface[]>([])
+    const [user, setUser] = useState<UserInterface | null> (null)
+     
+// exibir todos os ususarios exceto o que esta logado
+//  async function findAll(userId : string) {
+//       await api.get('/users').then((response) => {
+//         const otherUsers = users.filter((user) => user.id !== userId)
+//         setUsers(users.concat(otherUsers))
+//         console.log(users, response)
+//       })
+//       .catch((error) => {
+//         console.log(error)
+//       })
+//     }
+
+
+    async function findAll() {
+      await api.get('/users').then((response) => {
+        setUsers(users.concat(response.data.data))
+        console.log(users)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    }
+
+    async function findById() {
+         await api.get(`/users/${id}`).then((response) =>
+        {
+          setUser(response.data.data)
+          console.log(response.data.data)
+          
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+        setId("")
+    }
+
+    async function deleteUser(idToDelete : string) {
+      try {
+        
+        await api.delete(`/users/${idToDelete}`).then((response) => {
+          setUsers(users.filter((user) => user.id !== idToDelete))
+          console.log("chegou", response)
+  //setUsers()
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
 
     return(
          <Box minH="100vh" bg="#234E52" p={8} color="white">
-      {/* Container central */}
+     
       <Box
         bg="white"
         color="#234E52"
@@ -28,36 +94,87 @@ function UserScreen() {
           Buscar Usuários
         </Heading>
 
-        {/* Campos de busca */}
+      
         <Flex
           direction={["column", "row"]}
-          gap={4}
+          gap={10}
           mb={8}
         >
-          <FormControl>
-            <FormLabel>Buscar por nome</FormLabel>
-            <Input
-              placeholder="Digite o nome do usuário"
-              focusBorderColor="#38B2AC"
-              bg="white"
-            />
-          </FormControl>
-
+          <form onSubmit={(e) => {
+                    e.preventDefault()
+                    findById()
+                  }} >
           <FormControl>
             <FormLabel>Buscar por ID</FormLabel>
             <Input
               placeholder="Digite o ID do usuário"
               focusBorderColor="#38B2AC"
               bg="white"
+              value= {id}
+              mb={6}
+                onChange={(e: React.ChangeEvent<HTMLInputElement >) => {
+                  const newValue = e.currentTarget.value;
+                setId(newValue)
+                
+              }}
+             
             />
-          </FormControl>
+           <Button
+                        type="submit"
+                        width="full"
+                        size="lg"
+                        bg="#38B2AC"
+                        color="white"
+                        mb={6}
+                        _hover={{ bg: "#81E6D9" }}
+                        >
+                        Buscar
+                      </Button>
+          <Button
+                        type="submit"
+                        onClick={(e) => {
+                    e.preventDefault()
+                    findAll()
+                  }}
+                        width="full"
+                        size="lg"
+                        bg="#38B2AC"
+                        color="white"
+                        _hover={{ bg: "#81E6D9" }}
+                        >
+                        Exibir todos
+                      </Button>
+                        </FormControl>
+          </form>
+                
         </Flex>
 
-        {/* Lista de usuários */}
-       <SimpleGrid columns={[1, 2, 3]} spacing={6}>
-          {[1, 2, 3, 4, 5, 6].map((id) => (
+        <Flex>
+       
+          {user && (
             <Box
-              key={id}
+              key={user.id}
+              bg="#E6FFFA"
+              gap={6}
+              p={4}
+              mb={6}
+              rounded="md"
+              boxShadow="md"
+              transition="0.2s"
+              _hover={{ transform: "scale(1.02)", boxShadow: "lg" }}
+            >
+              <Text fontWeight="bold">{user.firstName}  {user.lastName}</Text>
+              <Text>Email: {user.email}</Text>
+              <Text>ID: {user.id}</Text>
+            </Box>
+          )}
+        </Flex>
+
+                
+              <SimpleGrid columns={[1, 2, 3]} spacing={6}>
+          {users.map((user) => (
+            <Box
+              key={user.id}
               bg="#E6FFFA"
               p={4}
               rounded="md"
@@ -65,12 +182,35 @@ function UserScreen() {
               transition="0.2s"
               _hover={{ transform: "scale(1.02)", boxShadow: "lg" }}
             >
-              <Text fontWeight="bold">Nome Sobrenome {id}</Text>
-              <Text>Email: usuario{id}@site.com</Text>
-              <Text>ID: {id * 100}</Text>
+              <Text fontWeight="bold">{user.firstName} {user.lastName}</Text>
+              <Text>Email: {user.email}</Text>
+              <Text>ID: {user.id}</Text>
+              {isAdmin && (
+              <Flex position="absolute" top={2} right={2} gap={2}>
+            <IconButton
+            onClick={() => deleteUser(user.id)}
+              aria-label="Excluir"
+              icon={<TrashIcon size={20} />}
+              variant="ghost"
+              color="#234E52"
+              _hover={{ bg: "#E6FFFA" }}
+              />
+            <IconButton
+            onClick={() => navigate(`/user/${user.id}`)}
+              aria-label="Editar"
+              icon={<PencilIcon size={20} />}
+              variant="ghost"
+              color="red.600"
+              _hover={{ bg: "#E6FFFA" }}
+              />
+          </Flex>
+            )}
+
             </Box>
+            
           ))}
         </SimpleGrid>
+    
       </Box>
     </Box>
     )

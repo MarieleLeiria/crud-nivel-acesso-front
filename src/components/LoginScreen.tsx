@@ -1,13 +1,48 @@
-import { Flex, Box, Heading, FormControl, FormLabel, Input, Button } from  '@chakra-ui/react';
-//import { useState } from 'react';
+import { Flex, Box, Heading, FormControl, FormLabel, Input, Button, Image } from  '@chakra-ui/react';
+import { useState } from 'react';
+import api from '../api/api';
+import { useNavigate } from 'react-router';
+import Heroimage from '../assets/hero-image.png'
 
-
-//const [email, setEmail] = useState()
 
 function LoginScreen() {
+  
+  const [email, setEmail] = useState<string>('')
+  const [senha, setSenha] = useState<string>('')
+
+  const navigate = useNavigate()
+  
+  async function loginValidation(){
+   try {
+     const response = await api.post('users/login', {
+       email,
+       senha,
+      });
+      const data = response.data.data
+      const typeUser = data.acess
+    
+
+      if(typeUser == 'user'){
+        console.log("user type")
+            navigate('/user')
+      }
+      if(typeUser == 'admin'){
+                console.log("admin type")
+
+        navigate('/admin')
+      }
+     
+  } catch (error: any) {
+    console.error("Erro ao fazer login:", error.response?.data || error.message);
+    
+  }
+}
+
 return(
        <Flex height="100vh" width="100%">
-      <Box flex="1" bg="#E6FFFA" />
+      <Box flex="1" bg="#E6FFFA">
+        <Image src={Heroimage} width='1300px' height='1200px' alt='Mestre'/>
+        </Box>
 
       <Flex
         flex="1"
@@ -27,7 +62,12 @@ return(
             Login
           </Heading>
 
-          <form>
+          <form
+           onSubmit={(e) => {
+                    e.preventDefault()
+                    loginValidation()
+                }}
+          >
             <FormControl id="email" mb={6} isRequired>
               <FormLabel color="#234E52">Email</FormLabel>
               <Input
@@ -35,7 +75,11 @@ return(
                 size="lg"
                 focusBorderColor="#38B2AC"
                 placeholder="Digite seu email"
-                
+                value= {email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement >) => {
+                const newValue = e.currentTarget.value;
+                setEmail(newValue)
+                }}
               />
             </FormControl>
 
@@ -46,6 +90,11 @@ return(
                 size="lg"
                 focusBorderColor="#38B2AC"
                 placeholder="Digite sua senha"
+                value= {senha}
+                onChange={(e: React.ChangeEvent<HTMLInputElement >) => {
+                const newValue = e.currentTarget.value;
+                setSenha(newValue)
+                }}
               />
             </FormControl>
 
