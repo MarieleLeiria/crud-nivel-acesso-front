@@ -11,7 +11,7 @@ import {
    IconButton 
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import api from '../api/api'
 import {TrashIcon, PencilIcon} from '@phosphor-icons/react'
 
@@ -26,35 +26,26 @@ function UserScreen({isAdmin = false} : {isAdmin?: boolean } = {}) {
    
     const [users, setUsers] = useState<UserInterface[]>([])
     const [user, setUser] = useState<UserInterface | null> (null)
-     
-// exibir todos os ususarios exceto o que esta logado
-//  async function findAll(userId : string) {
-//       await api.get('/users').then((response) => {
-//         const otherUsers = users.filter((user) => user.id !== userId)
-//         setUsers(users.concat(otherUsers))
-//         console.log(users, response)
-//       })
-//       .catch((error) => {
-//         console.log(error)
-//       })
-//     }
+
 
 
     async function findAll() {
-      await api.get('/users').then((response) => {
-        setUsers(users.concat(response.data.data))
-        console.log(users)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    }
+  try {
+    const response = await api.get('/users');
+    setUsers(prevUsers => [...prevUsers, ...response.data.data]);
+    console.log(response.data.data);
+  } catch (error) {
+    console.error('Erro ao buscar usuários:', error);
+  }
+}
+  
 
     async function findById() {
+      if(!id) return;
+
          await api.get(`/users/${id}`).then((response) =>
         {
           setUser(response.data.data)
-          console.log(response.data.data)
           
         })
         .catch((error) => {

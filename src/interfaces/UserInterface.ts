@@ -4,5 +4,5 @@ export default class UserInterface {
   lastName = "";
   email = "";
   senha = "";
-  acess = "";
+  access = "";
 }

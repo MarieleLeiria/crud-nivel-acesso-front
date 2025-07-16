@@ -12,33 +12,42 @@ const [firstName, setFirstname] = useState('')
 const [lastName, setLastname] = useState('')
 const [email, setEmail] = useState('')
 const [senha, setSenha] = useState('')
-const [acess, setAcess] = useState('')
+const [access, setAccess] = useState('')
 
 const [newUser, setNewUser] = useState<UserInterface>()
 
   
 
-  async function createNewUser(){
-    try {
-      const response = await api.post('users', {
-      firstName,
-      lastName,
-      email,
-      senha,
-      acess
-      })
+async function createNewUser(){
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.post(
+      'users',
+      {
+        firstName,
+        lastName,
+        email,
+        senha,
+        access
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
 
-setNewUser(response.data.data);
+    setNewUser(response.data.data);
 
-} catch (error) {
-  console.log(error)
-}
-// setFirstname('')
-// setLastname('')
-// setEmail('')
-// setSenha('')
-// setAcess('')
+  } catch (error) {
+    console.log(error)
   }
+  // setFirstname('')
+  // setLastname('')
+  // setEmail('')
+  // setSenha('')
+  // setAcess('')
+}
 
   return(
       
@@ -123,10 +132,10 @@ setNewUser(response.data.data);
               type="acess"
               placeholder="Tipo de usuario"
               focusBorderColor="#38B2AC"
-              value= {acess}
+              value= {access}
                 onChange={(e: React.ChangeEvent<HTMLInputElement >) => {
                 const newValue = e.currentTarget.value;
-                setAcess(newValue)
+                setAccess(newValue)
                 }}
               />
 

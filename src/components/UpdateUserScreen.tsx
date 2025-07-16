@@ -16,6 +16,7 @@ const {id} = useParams()
 
 
 async function updateUser() {
+  const token = localStorage.getItem('token');
         try {
         await api.patch(`users/${id}`, {
             firstName,
@@ -23,7 +24,12 @@ async function updateUser() {
             email,
             senha,
             acess
-          })
+           
+          },
+        { headers: {
+          Authorization: `Bearer ${token}`
+        }}
+        )
         } catch (error) {
           console.log(error)
         }
