@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router';
 import api from '../api/api'
-import { FormControl, Flex, Box, Heading, FormLabel, Input, Button } from '@chakra-ui/react';
+import { FormControl, Flex, Box, Heading, FormLabel, Input, Button, useToast } from '@chakra-ui/react';
 
  function Login() {
   const [email, setEmail] = useState('');
@@ -10,6 +10,7 @@ import { FormControl, Flex, Box, Heading, FormLabel, Input, Button } from '@chak
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const toast = useToast()
   async function loginValidation() {
   try {
     const response = await api.post('/auth/login', {
@@ -29,17 +30,20 @@ import { FormControl, Flex, Box, Heading, FormLabel, Input, Button } from '@chak
 
     login(token); 
     navigate("/redirect");
-  } catch (err) {
-    console.error('Erro ao fazer login:', err);
-    alert('Erro ao fazer login');
-  }
+  } catch (error) {
+    console.error('Erro ao fazer login:', error);
+  toast({
+          title: "Não foi possível criar usuario.",
+          description: `Título: ${error && typeof error === "object" &&  "message" in error ? (error as any).message : String(error)}`,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });  }
 }
 
  return(
       <Flex height="100vh" width="100%">
-      {/* <Box flex="1" bg="#E6FFFA">
-        <Image src={HeroImage} width='1300px' height='1200px' alt='Mestre'/>
-        </Box> */}
 
       <Flex
         flex="1"

@@ -11,7 +11,7 @@ export function PrivateRoute({ children, role }: PrivateRouteProps) {
   const { isAuthenticated, userRole } = useAuth();
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth/user" />;
+    return <Navigate to="/" />;
   }
 
   if (role && userRole !== role) {

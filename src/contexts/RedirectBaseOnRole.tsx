@@ -1,9 +1,8 @@
 import { Navigate } from "react-router";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "./AuthContext";
 
 function RedirectBaseOnRole() {
     const { userRole} = useAuth();
-    console.log("user role ", userRole)
     if(userRole === 'admin'){
         return <Navigate to="/auth/admin" />
     }
