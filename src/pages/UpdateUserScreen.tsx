@@ -37,21 +37,13 @@ function UpdateUserScreen() {
     fetchUserData();
   }, [id]);
 
-  //   useEffect(() => {
-  //   async function fetchUser() {
-  //     const response = await api.get(`auth/${id}`);
-  //     const data = response.data;
-  //     setObjectUser({
-  //       firstName: data.firstName,
-  //       lastName: data.lastName,
-  //       access: data.access.toLowerCase(), // 👈 isso garante que vem minúsculo
-  //     });
-  //   }
-  //   fetchUser();
-  // }, []);
+  // useEffect(() => {
+  //   console.log("objectUser: ", objectUser);
+  // }, [objectUser]);
 
   async function updateUser() {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
+    console.log("token: ", token);
     if (!objectUser.firstName || !objectUser.lastName || !objectUser.access)
       return;
 
@@ -132,12 +124,16 @@ function UpdateUserScreen() {
             <Select
               value={objectUser.access}
               onChange={(e) => {
-                setObjectUser({ ...objectUser, access: e.target.value });
+                const newValue = e.target.value.toLowerCase();
+                setObjectUser({
+                  ...objectUser,
+                  access: newValue,
+                });
               }}
             >
               <option value="">Selecione o tipo de acesso</option>
-              <option value="User">User</option>
-              <option value="Admin">Admin</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
             </Select>
           </FormControl>
 
