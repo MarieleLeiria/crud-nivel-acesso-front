@@ -13,7 +13,7 @@ function Home() {
         textAlign="center"
         overflow="hidden"
       >
-        <VStack spacing={6}>
+        <VStack spacing={7}>
           <Heading fontSize="4xl" color="pink.500">
             ✨ Bem-vinda ao Sisteminha da Mari 💖
           </Heading>
